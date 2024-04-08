@@ -118,7 +118,7 @@ def main(opts=None):
         print("Single models:", end="\n    ")
         print("\n    ".join(models["single"]))
         sys.exit(0)
-    tracks = find_files(args.tracks)
+    tracks = find_files(args.tracks[0])
     if len(tracks) == 0:
         print("error: the following arguments are required: tracks", file=sys.stderr)
         sys.exit(1)
