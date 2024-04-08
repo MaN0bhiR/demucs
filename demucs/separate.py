@@ -7,7 +7,7 @@
 import argparse
 import sys
 from pathlib import Path
-
+from tqdm import tqdm
 from dora.log import fatal
 import torch as th
 
@@ -21,7 +21,7 @@ from .pretrained import add_model_flags, ModelLoadingError
 def get_parser():
     parser = argparse.ArgumentParser("demucs.separate",
                                      description="Separate the sources for the given tracks")
-    parser.add_argument("tracks", nargs='*', type=Path, default=[], help='Path to tracks')
+    parser.add_argument("tracks", nargs='*', type=Path, default=Path("Data"), help='Path to folder of tracks')
     add_model_flags(parser)
     parser.add_argument("--list-models", action="store_true", help="List available models "
                         "from current repo and exit")
@@ -98,6 +98,13 @@ def get_parser():
 
     return parser
 
+def find_files(in_path):
+    extensions = ["mp3", "wav", "ogg", "flac"]
+    out = []
+    for file in Path(in_path).iterdir():
+        if file.suffix.lower().lstrip(".") in extensions:
+            out.append(file)
+    return out
 
 def main(opts=None):
     parser = get_parser()
@@ -109,7 +116,8 @@ def main(opts=None):
         print("Single models:", end="\n    ")
         print("\n    ".join(models["single"]))
         sys.exit(0)
-    if len(args.tracks) == 0:
+    tracks = find_files(args.tracks)
+    if len(tracks) == 0:
         print("error: the following arguments are required: tracks", file=sys.stderr)
         sys.exit(1)
 
@@ -120,7 +128,7 @@ def main(opts=None):
                               shifts=args.shifts,
                               split=args.split,
                               overlap=args.overlap,
-                              progress=True,
+                              progress=False,
                               jobs=args.jobs,
                               segment=args.segment)
     except ModelLoadingError as error:
@@ -148,10 +156,9 @@ def main(opts=None):
                 stem=args.stem, sources=", ".join(separator.model.sources)
             )
         )
-    out = args.out / args.name
-    out.mkdir(parents=True, exist_ok=True)
-    print(f"Separated tracks will be stored in {out.resolve()}")
-    for track in args.tracks:
+    
+    #print(f"Separated tracks will be stored in {out.resolve()}")
+    for track in tqdm(tracks):
         if not track.exists():
             print(f"File {track} does not exist. If the path contains spaces, "
                   'please try again after surrounding the entire path with quotes "".',
@@ -175,6 +182,9 @@ def main(opts=None):
             "as_float": args.float32,
             "bits_per_sample": 24 if args.int24 else 16,
         }
+
+        out = track.replace(args.tracks , args.out)
+        out.mkdir(parents=True, exist_ok=True)
         if args.stem is None:
             for name, source in res.items():
                 stem = out / args.filename.format(

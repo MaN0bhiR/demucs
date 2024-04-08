@@ -13,7 +13,7 @@ import numpy as np
 import torch
 import torchaudio as ta
 import typing as tp
-
+import torchaudio.transforms as T
 from .utils import temp_filenames
 
 
@@ -247,6 +247,7 @@ def save_audio(wav: torch.Tensor,
     2 for highest quality, 7 for fastest speed
     """
     wav = prevent_clip(wav, mode=clip)
+    wav = convert_audio(wav , sample_rate , 16000 , 1)
     path = Path(path)
     suffix = path.suffix.lower()
     if suffix == ".mp3":
@@ -257,9 +258,9 @@ def save_audio(wav: torch.Tensor,
             encoding = 'PCM_F'
         else:
             encoding = 'PCM_S'
-        ta.save(str(path), wav, sample_rate=samplerate,
+        ta.save(str(path), wav, sample_rate=16000,
                 encoding=encoding, bits_per_sample=bits_per_sample)
     elif suffix == ".flac":
-        ta.save(str(path), wav, sample_rate=samplerate, bits_per_sample=bits_per_sample)
+        ta.save(str(path), wav, sample_rate=16000, bits_per_sample=bits_per_sample)
     else:
         raise ValueError(f"Invalid suffix for path: {suffix}")
