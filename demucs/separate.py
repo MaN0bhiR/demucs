@@ -21,7 +21,7 @@ from .pretrained import add_model_flags, ModelLoadingError
 def get_parser():
     parser = argparse.ArgumentParser("demucs.separate",
                                      description="Separate the sources for the given tracks")
-    parser.add_argument("tracks", nargs='*', type=Path, default=[], help='Path to tracks')
+    parser.add_argument("--tracks", type=Path, default="AIR", help='Path to tracks')
     add_model_flags(parser)
     parser.add_argument("--list-models", action="store_true", help="List available models "
                         "from current repo and exit")
