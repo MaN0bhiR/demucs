@@ -23,7 +23,8 @@ def get_parser():
                                      description="Separate the sources for the given tracks")
     
     add_model_flags(parser)
-    parser.add_argument("--tracks", type=Path, default=Path("Data"), help='Path to folder of tracks')
+    
+    parser.add_argument("--tracks", default="AIR", help='Path to folder of tracks')
     parser.add_argument("--list-models", action="store_true", help="List available models "
                         "from current repo and exit")
     parser.add_argument("-v", "--verbose", action="store_true")
