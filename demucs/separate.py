@@ -24,7 +24,7 @@ def get_parser():
     #parser.add_argument("tracks", nargs='*', type=str, default="AIR", help='Path to tracks')
     add_model_flags(parser)
     
-    #parser.add_argument("--tracks", default="AIR", help='Path to folder of tracks')
+    parser.add_argument("--tracks", default="AIR", help='Path to folder of tracks')
     parser.add_argument("--list-models", action="store_true", help="List available models "
                         "from current repo and exit")
     parser.add_argument("-v", "--verbose", action="store_true")
